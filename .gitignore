@@ -160,7 +160,7 @@ cython_debug/
 .idea
 
 # PyTorch
-.vector_cache
+.vector_cache/*
 
 # Ignore downloaded .zip
 *.zip
