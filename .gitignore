@@ -168,3 +168,10 @@ cython_debug/
 # Ignore data
 data/raw/filtered.tsv
 data/interim/intermediate.tsv
+data/interim/bert.tsv
+
+# Ignore models
+models/*.pt
+
+# Ignore tensorboard stuff
+t5-small-finetuned-de-toxification

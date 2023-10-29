@@ -2,14 +2,19 @@ import zipfile
 import time
 import pandas as pd
 import torchtext
+import sys
 
 from pathlib import Path
+from typing import Callable, Optional
 from download_from_url import download_url
+from transformers import BertTokenizer
+from tqdm import tqdm
 
 RAW_ZIP_NAME = 'filtered_paranmt.zip'
 RAW_URL_FILE = 'filtered_url.txt'
 RAW_FILE_NAME = 'filtered.tsv'
 INTERMEDIATE_FILE_NAME = 'intermediate.tsv'
+BERT_FILE_NAME = 'bert.tsv'
 
 
 def get_root_path() -> Path:
@@ -67,8 +72,33 @@ def check_presence_of_raw_data(root_path: Path, force_rewrite: bool = False) -> 
     return raw_data_file
 
 
-def to_intermediate(raw_data_file: Path, root_path: Path, force_rewrite: bool = False):
-    intermediate_path = root_path / 'data' / 'interim' / INTERMEDIATE_FILE_NAME
+def apply_tokenizer(raw: pd.DataFrame, tokenizer: Callable) -> pd.DataFrame:
+    refs = raw['reference'].values
+    trns = raw['translation'].values
+
+    new_refs = []
+    new_trns = []
+
+    for data in tqdm(zip(refs, trns), total=len(refs)):
+        new_refs.append(tokenizer(data[0]))
+        new_trns.append(tokenizer(data[1]))
+
+    raw['reference'] = new_refs
+    raw['translation'] = new_trns
+    return raw
+
+
+def to_intermediate(raw_data_file: Path,
+                    root_path: Path,
+                    force_rewrite: bool = False,
+                    tokenizer: Optional[Callable] = None,
+                    intermediate_file_name: Optional[str] = None):
+    if tokenizer is None:
+        tokenizer = torchtext.data.utils.get_tokenizer('basic_english')
+    if intermediate_file_name is None:
+        intermediate_file_name = INTERMEDIATE_FILE_NAME
+
+    intermediate_path = root_path / 'data' / 'interim' / intermediate_file_name
     if intermediate_path.exists() and not force_rewrite:
         print(f'{intermediate_path.name} is present')
         return
@@ -76,7 +106,6 @@ def to_intermediate(raw_data_file: Path, root_path: Path, force_rewrite: bool = 
     print('Constructing intermediate representation...')
     raw = pd.read_csv(raw_data_file, delimiter='\t')
     raw = raw[raw.columns[1:]]
-    tokenizer = torchtext.data.utils.get_tokenizer('basic_english')
 
     # Lower
     print('To lower')
@@ -99,17 +128,31 @@ def to_intermediate(raw_data_file: Path, root_path: Path, force_rewrite: bool = 
 
     # Tokenize
     print('Tokenize')
-    raw['reference'] = raw['reference'].apply(tokenizer)
-    raw['translation'] = raw['translation'].apply(tokenizer)
+    # raw['reference'] = raw['reference'].apply(tokenizer)
+    # raw['translation'] = raw['translation'].apply(tokenizer)
+    raw = apply_tokenizer(raw, tokenizer)
 
     raw.to_csv(intermediate_path, sep='\t', index=False)
     print('Done')
 
 
 def main():
+    args = [] if len(sys.argv) == 1 else sys.argv[1:]
+    force_rewrite = False
+    tokenizer = None
+    intermediate_file_name = None
+
+    if '--rewrite' in args:
+        force_rewrite = True
+
+    if '--bert' in args:
+        intermediate_file_name = BERT_FILE_NAME
+        bert_tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        tokenizer = lambda x: bert_tokenizer.tokenize(x)
+
     root_path = get_root_path()
-    raw_data_file = check_presence_of_raw_data(root_path)
-    to_intermediate(raw_data_file, root_path)
+    raw_data_file = check_presence_of_raw_data(root_path, force_rewrite)
+    to_intermediate(raw_data_file, root_path, force_rewrite, tokenizer, intermediate_file_name)
 
 
 if __name__ == '__main__':
