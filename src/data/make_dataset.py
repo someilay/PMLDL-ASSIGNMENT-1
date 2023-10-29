@@ -18,6 +18,12 @@ BERT_FILE_NAME = 'bert.tsv'
 
 
 def get_root_path() -> Path:
+    """
+    Get the root path of the project.
+
+    Returns:
+        Path: Path to the project's root directory.
+    """
     candidates = ['../..', '..', '.']
     for candidate in candidates:
         readme_candidate = Path(candidate) / 'README.md'
@@ -32,12 +38,32 @@ def get_root_path() -> Path:
 
 
 def get_raw_url(data_path: Path) -> str:
+    """
+    Read the URL from a file that contains the data URL.
+
+    Args:
+        data_path (Path): Path to the 'data' directory.
+
+    Returns:
+        str: The raw data URL.
+    """
     raw_url_file = data_path / 'raw' / RAW_URL_FILE
     with open(raw_url_file) as url_file:
         return url_file.readline()
 
 
 def download_raw(raw_url: str, save_dir: Path, filename: str = RAW_ZIP_NAME) -> Path:
+    """
+    Download the raw data from a given URL.
+
+    Args:
+        raw_url (str): The URL to download the raw data from.
+        save_dir (Path): The directory where the data will be saved.
+        filename (str): The name of the saved file.
+
+    Returns:
+        Path: Path to the downloaded raw data file.
+    """
     print('Downloading data')
     time.sleep(0.5)
     download_url(raw_url, save_dir / filename)
@@ -45,12 +71,29 @@ def download_raw(raw_url: str, save_dir: Path, filename: str = RAW_ZIP_NAME) -> 
 
 
 def unzip_raw(raw_zip: Path, path_to: Path):
+    """
+    Unzip a raw data file to the specified directory.
+
+    Args:
+        raw_zip (Path): Path to the zipped raw data file.
+        path_to (Path): Path to the directory where the data will be extracted.
+    """
     print(f'Extracting {raw_zip.name}')
     with zipfile.ZipFile(raw_zip, 'r') as zip_ref:
         zip_ref.extractall(path_to)
 
 
 def check_presence_of_raw_data(root_path: Path, force_rewrite: bool = False) -> Path:
+    """
+    Check if the raw data exists and download/unzip it if necessary.
+
+    Args:
+        root_path (Path): Path to the root of the project.
+        force_rewrite (bool, optional): If True, re-download and re-unzip even if data is present.
+
+    Returns:
+        Path: Path to the raw data file.
+    """
     data_path = root_path / 'data'
 
     raw_path = data_path / 'raw'
@@ -73,6 +116,16 @@ def check_presence_of_raw_data(root_path: Path, force_rewrite: bool = False) -> 
 
 
 def apply_tokenizer(raw: pd.DataFrame, tokenizer: Callable) -> pd.DataFrame:
+    """
+    Apply a tokenizer to the 'reference' and 'translation' columns of a DataFrame.
+
+    Args:
+        raw (pd.DataFrame): Input DataFrame containing 'reference' and 'translation' columns.
+        tokenizer (Callable): Tokenizer function to apply.
+
+    Returns:
+        pd.DataFrame: DataFrame with tokenized 'reference' and 'translation' columns.
+    """
     refs = raw['reference'].values
     trns = raw['translation'].values
 
@@ -93,6 +146,16 @@ def to_intermediate(raw_data_file: Path,
                     force_rewrite: bool = False,
                     tokenizer: Optional[Callable] = None,
                     intermediate_file_name: Optional[str] = None):
+    """
+    Convert raw data to an intermediate representation with optional text preprocessing.
+
+    Args:
+        raw_data_file (Path): Path to the raw data file.
+        root_path (Path): Path to the root of the project.
+        force_rewrite (bool, optional): If True, rewrite the intermediate file even if present.
+        tokenizer (Optional[Callable], optional): Tokenizer function for text preprocessing.
+        intermediate_file_name (Optional[str], optional): Name of the intermediate file.
+    """
     if tokenizer is None:
         tokenizer = torchtext.data.utils.get_tokenizer('basic_english')
     if intermediate_file_name is None:
@@ -137,10 +200,17 @@ def to_intermediate(raw_data_file: Path,
 
 
 def main():
+    """
+    Main function to download raw data, preprocess it, and save it in an intermediate format.
+    """
     args = [] if len(sys.argv) == 1 else sys.argv[1:]
     force_rewrite = False
     tokenizer = None
     intermediate_file_name = None
+
+    if '--help' in args:
+        print('Usage: python3 make_dataset.py --rewrite-(rewrite generated dataset) --bert-(use bert tokenizer)')
+        exit(0)
 
     if '--rewrite' in args:
         force_rewrite = True
