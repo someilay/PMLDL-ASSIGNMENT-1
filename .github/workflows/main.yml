@@ -32,7 +32,7 @@ jobs:
           pip install torch torchvision torchaudio torchtext --index-url https://download.pytorch.org/whl/cpu
 
       - name: Show dependencies
-        run: pip test
+        run: pip list
 
       - name: Run make_dataset.py
         run: python src/data/make_dataset.py
