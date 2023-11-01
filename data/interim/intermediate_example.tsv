@@ -1,0 +1,6 @@
+reference	translation	similarity	lenght_diff	ref_tox	trn_tox
+['if', 'alkar', 'is', 'flooding', 'her', 'with', 'psychic', 'waste', ',', 'that', 'explains', 'the', 'high', 'level', 'of', 'neurotransmitters', '.']	['if', 'alkar', 'floods', 'her', 'with', 'her', 'mental', 'waste', ',', 'it', 'would', 'explain', 'the', 'high', 'levels', 'of', 'neurotransmitter', '.']	0.785170556584	0.0103092783505154	0.0141952484846115	0.9819834232330322
+"['now', 'you', ""'"", 're', 'getting', 'nasty', '.']"	"['you', ""'"", 're', 'becoming', 'disgusting', '.']"	0.749686862828	0.0714285714285714	0.0654725134372711	0.9990390539169312
+['well', ',', 'we', 'could', 'spare', 'your', 'life', ',', 'for', 'one', '.']	['well', ',', 'we', 'can', 'spare', 'your', 'life', '.']	0.91905108037	0.2682926829268293	0.2133129686117172	0.98506760597229
+"['ah', '!', 'monkey', ',', 'you', ""'"", 've', 'got', 'to', 'snap', 'out', 'of', 'it', '.']"	['monkey', ',', 'you', 'have', 'to', 'wake', 'up', '.']	0.664333132494	0.3095238095238095	0.0533622205257415	0.9942149519920348
+"['i', ""'"", 've', 'got', 'orders', 'to', 'put', 'her', 'down', '.']"	['i', 'have', 'orders', 'to', 'kill', 'her', '.']	0.726639296422	0.1818181818181818	0.0094018271192908	0.9993481040000916
