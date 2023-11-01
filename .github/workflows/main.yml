@@ -32,20 +32,26 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
-      - name: Install dependencies
+      - name: Install dependencies for Windows
+        if: matrix.os == 'windows-latest'
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          if [ "$RUNNER_OS" == "Linux" ]; then
-            pip install torch torchvision torchaudio torchtext --index-url https://download.pytorch.org/whl/cpu
-          elif [ "$RUNNER_OS" == "Windows" ]; then
-            pip install torch torchvision torchaudio torchtext
-          elif [ "$RUNNER_OS" == "MacOS" ]; then
-            pip install torch torchvision torchaudio torchtext
-          else
-            echo "$RUNNER_OS not supported"
-            exit 1
-          fi
+          pip3 install torch torchvision torchaudio torchtext
+
+      - name: Install dependencies for Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip3 install torch torchvision torchaudio torchtext --index-url https://download.pytorch.org/whl/cpu
+
+      - name: Install dependencies for MacOS
+        if: matrix.os == 'macos-latest'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip3 install torch torchvision torchaudio torchtext
 
       - name: Show dependencies
         run: pip list
