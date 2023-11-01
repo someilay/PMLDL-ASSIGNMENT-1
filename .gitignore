@@ -175,3 +175,6 @@ models/*.pt
 
 # Ignore tensorboard stuff
 t5-small-finetuned-de-toxification
+
+# Ignore visualization
+src/visualization/*.png
