@@ -22,12 +22,6 @@ jobs:
         with:
             python-version: 3.9
 
-      - name: Check dependencies
-        uses: xu-cheng/latex-action@v2
-        with:
-          root_file: main.tex
-          working_directory: notes/schur_complement
-
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
 
