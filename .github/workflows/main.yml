@@ -36,7 +36,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install torch torchvision torchaudio torchtext --index-url https://download.pytorch.org/whl/cpu
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            pip install torch torchvision torchaudio torchtext --index-url https://download.pytorch.org/whl/cpu
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            pip install torch torchvision torchaudio torchtext
+          elif [ "$RUNNER_OS" == "MacOS" ]; then
+            pip install torch torchvision torchaudio torchtext
+          else
+            echo "$RUNNER_OS not supported"
+            exit 1
+          fi
 
       - name: Show dependencies
         run: pip list
